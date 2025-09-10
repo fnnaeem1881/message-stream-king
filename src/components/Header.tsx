@@ -6,11 +6,11 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigation = [
-    { name: 'Products', href: '#' },
-    { name: 'Docs', href: '#' },
-    { name: 'Pricing', href: '#' },
-    { name: 'Blog', href: '#' },
-    { name: 'Support', href: '#' },
+    { name: 'Products', href: '/products' },
+    { name: 'Docs', href: '/docs' },
+    { name: 'Pricing', href: '/pricing' },
+    { name: 'Blog', href: '/blog' },
+    { name: 'Support', href: '/support' },
   ];
 
   return (
