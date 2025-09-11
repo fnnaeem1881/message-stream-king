@@ -18,26 +18,26 @@ const Footer = () => {
       links: [
         { name: "Documentation", href: "/docs" },
         { name: "Tutorials", href: "/tutorials" },
-        { name: "API Reference", href: "/docs" },
-        { name: "Libraries", href: "/docs" }
+        { name: "API Reference", href: "/api-reference" },
+        { name: "Libraries", href: "/libraries" }
       ]
     },
     {
       title: "Company",
       links: [
         { name: "About", href: "/about" },
-        { name: "Careers", href: "/about" },
-        { name: "Press", href: "/about" },
-        { name: "Partners", href: "/about" }
+        { name: "Careers", href: "/careers" },
+        { name: "Press", href: "/press" },
+        { name: "Partners", href: "/partners" }
       ]
     },
     {
       title: "Support",
       links: [
-        { name: "Help Center", href: "/support" },
-        { name: "Status", href: "/support" },
+        { name: "Help Center", href: "/help-center" },
+        { name: "Status", href: "/status" },
         { name: "Contact", href: "/contact" },
-        { name: "Community", href: "/support" }
+        { name: "Community", href: "/community" }
       ]
     }
   ];
@@ -140,7 +140,7 @@ const Footer = () => {
               <a href="/terms-of-service" className="text-muted-foreground hover:text-accent transition-colors">
                 Terms of Service
               </a>
-              <a href="/privacy-policy" className="text-muted-foreground hover:text-accent transition-colors">
+              <a href="/cookie-policy" className="text-muted-foreground hover:text-accent transition-colors">
                 Cookie Policy
               </a>
             </div>

@@ -19,6 +19,15 @@ import ChatKit from "./pages/ChatKit";
 import Tutorials from "./pages/Tutorials";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import Libraries from "./pages/Libraries";
+import ApiReference from "./pages/ApiReference";
+import Careers from "./pages/Careers";
+import Press from "./pages/Press";
+import Partners from "./pages/Partners";
+import HelpCenter from "./pages/HelpCenter";
+import Status from "./pages/Status";
+import Community from "./pages/Community";
+import CookiePolicy from "./pages/CookiePolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,8 +53,17 @@ const App = () => (
           <Route path="/beams" element={<Beams />} />
           <Route path="/chatkit" element={<ChatKit />} />
           <Route path="/tutorials" element={<Tutorials />} />
+          <Route path="/libraries" element={<Libraries />} />
+          <Route path="/api-reference" element={<ApiReference />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/press" element={<Press />} />
+          <Route path="/partners" element={<Partners />} />
+          <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/status" element={<Status />} />
+          <Route path="/community" element={<Community />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/cookie-policy" element={<CookiePolicy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
