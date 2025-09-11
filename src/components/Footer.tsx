@@ -7,37 +7,37 @@ const Footer = () => {
     {
       title: "Products",
       links: [
-        { name: "Channels", href: "#" },
-        { name: "Beams", href: "#" },
-        { name: "ChatKit", href: "#" },
-        { name: "Pusher Channels", href: "#" }
+        { name: "Channels", href: "/channels" },
+        { name: "Beams", href: "/beams" },
+        { name: "ChatKit", href: "/chatkit" },
+        { name: "Pusher Channels", href: "/channels" }
       ]
     },
     {
       title: "Developers",
       links: [
-        { name: "Documentation", href: "#" },
-        { name: "Tutorials", href: "#" },
-        { name: "API Reference", href: "#" },
-        { name: "Libraries", href: "#" }
+        { name: "Documentation", href: "/docs" },
+        { name: "Tutorials", href: "/tutorials" },
+        { name: "API Reference", href: "/docs" },
+        { name: "Libraries", href: "/docs" }
       ]
     },
     {
       title: "Company",
       links: [
-        { name: "About", href: "#" },
-        { name: "Careers", href: "#" },
-        { name: "Press", href: "#" },
-        { name: "Partners", href: "#" }
+        { name: "About", href: "/about" },
+        { name: "Careers", href: "/about" },
+        { name: "Press", href: "/about" },
+        { name: "Partners", href: "/about" }
       ]
     },
     {
       title: "Support",
       links: [
-        { name: "Help Center", href: "#" },
-        { name: "Status", href: "#" },
-        { name: "Contact", href: "#" },
-        { name: "Community", href: "#" }
+        { name: "Help Center", href: "/support" },
+        { name: "Status", href: "/support" },
+        { name: "Contact", href: "/contact" },
+        { name: "Community", href: "/support" }
       ]
     }
   ];
@@ -134,13 +134,13 @@ const Footer = () => {
               © 2024 Pusher Ltd. All rights reserved.
             </div>
             <div className="flex flex-wrap gap-6 text-sm">
-              <a href="#" className="text-muted-foreground hover:text-accent transition-colors">
+              <a href="/privacy-policy" className="text-muted-foreground hover:text-accent transition-colors">
                 Privacy Policy
               </a>
-              <a href="#" className="text-muted-foreground hover:text-accent transition-colors">
+              <a href="/terms-of-service" className="text-muted-foreground hover:text-accent transition-colors">
                 Terms of Service
               </a>
-              <a href="#" className="text-muted-foreground hover:text-accent transition-colors">
+              <a href="/privacy-policy" className="text-muted-foreground hover:text-accent transition-colors">
                 Cookie Policy
               </a>
             </div>
