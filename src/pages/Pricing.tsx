@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Check, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useState } from "react";
 
 const Pricing = () => {
@@ -148,9 +149,11 @@ const Pricing = () => {
                       </li>
                     ))}
                   </ul>
-                  <Button variant={plan.variant} className="w-full group-hover:shadow-glow">
-                    {plan.cta}
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                  <Button variant={plan.variant} className="w-full group-hover:shadow-glow" asChild>
+                    <Link to="/signup">
+                      {plan.cta}
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -196,9 +199,11 @@ const Pricing = () => {
                       Volume discounts available
                     </p>
                     <div className="space-y-3">
-                      <Button variant="hero" size="lg" className="w-full lg:w-auto">
-                        Contact Sales
-                        <ArrowRight className="ml-2 h-5 w-5" />
+                      <Button variant="hero" size="lg" className="w-full lg:w-auto" asChild>
+                        <Link to="/contact">
+                          Contact Sales
+                          <ArrowRight className="ml-2 h-5 w-5" />
+                        </Link>
                       </Button>
                       <div className="text-sm text-muted-foreground">
                         Response within 24 hours
@@ -223,9 +228,11 @@ const Pricing = () => {
           </div>
           
           <div className="max-w-3xl mx-auto text-center">
-            <Button variant="hero" size="lg">
-              View All FAQs
-              <ArrowRight className="ml-2 h-5 w-5" />
+            <Button variant="hero" size="lg" asChild>
+              <Link to="/help-center">
+                View All FAQs
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
           </div>
         </div>

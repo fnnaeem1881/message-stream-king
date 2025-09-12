@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const CTA = () => {
   const features = [
@@ -23,12 +24,14 @@ const CTA = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button variant="hero" size="lg" className="group">
-              Start Free Trial
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+            <Button variant="hero" size="lg" className="group" asChild>
+              <Link to="/signup">
+                Start Free Trial
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Link>
             </Button>
-            <Button variant="secondary" size="lg">
-              Schedule Demo
+            <Button variant="secondary" size="lg" asChild>
+              <Link to="/contact">Schedule Demo</Link>
             </Button>
           </div>
           

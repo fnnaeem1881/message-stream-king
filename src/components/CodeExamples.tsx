@@ -2,8 +2,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Copy, Play } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 const CodeExamples = () => {
+  const { toast } = useToast();
+
+  const handleCopy = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast({
+      title: "Code copied!",
+      description: "Code has been copied to your clipboard.",
+    });
+  };
+
+  const handleRunDemo = (title: string) => {
+    toast({
+      title: "Demo started!",
+      description: `Running ${title} demo in console.`,
+    });
+    console.log(`Demo: ${title} is running...`);
+  };
+
   const examples = [
     {
       title: "Real-time Chat",
@@ -66,10 +86,18 @@ fetch('/api/messages', {
                   <Badge variant="secondary" className="mt-2">{example.language}</Badge>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="sm">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleCopy(example.code)}
+                  >
                     <Copy className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleRunDemo(example.title)}
+                  >
                     <Play className="h-4 w-4" />
                   </Button>
                 </div>
@@ -86,8 +114,8 @@ fetch('/api/messages', {
         </div>
         
         <div className="text-center mt-12">
-          <Button variant="hero" size="lg">
-            View Full Documentation
+          <Button variant="hero" size="lg" asChild>
+            <Link to="/docs">View Full Documentation</Link>
           </Button>
         </div>
       </div>

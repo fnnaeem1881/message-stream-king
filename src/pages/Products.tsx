@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, MessageCircle, Bell, Users, Globe, Zap, Shield } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Products = () => {
   const products = [
@@ -97,9 +98,11 @@ const Products = () => {
                       </li>
                     ))}
                   </ul>
-                  <Button variant="hero" className="w-full group-hover:shadow-glow">
-                    Learn More
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                  <Button variant="hero" className="w-full group-hover:shadow-glow" asChild>
+                    <Link to={`/${product.name.toLowerCase().replace(' ', '-')}`}>
+                      Learn More
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -147,12 +150,14 @@ const Products = () => {
               Choose the product that fits your needs and start building real-time features today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="lg">
-                Start Free Trial
-                <ArrowRight className="ml-2 h-5 w-5" />
+              <Button variant="hero" size="lg" asChild>
+                <Link to="/signup">
+                  Start Free Trial
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
               </Button>
-              <Button variant="secondary" size="lg">
-                Schedule Demo
+              <Button variant="secondary" size="lg" asChild>
+                <Link to="/contact">Schedule Demo</Link>
               </Button>
             </div>
           </div>
