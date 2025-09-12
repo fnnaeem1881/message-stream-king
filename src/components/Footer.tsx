@@ -1,53 +1,79 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Github, Twitter, Linkedin, Youtube } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getFooterContent, isExternalLink, type FooterSection, type SocialLink as SocialLinkType } from "@/lib/api/content";
+
+const iconMap = {
+  github: Github,
+  twitter: Twitter,
+  linkedin: Linkedin,
+  youtube: Youtube,
+};
+
+const fallbackSections: FooterSection[] = [
+  {
+    title: "Products",
+    links: [
+      { name: "Channels", href: "/channels" },
+      { name: "Beams", href: "/beams" },
+      { name: "ChatKit", href: "/chatkit" },
+      { name: "Pusher Channels", href: "/channels" }
+    ]
+  },
+  {
+    title: "Developers",
+    links: [
+      { name: "Documentation", href: "/docs" },
+      { name: "Tutorials", href: "/tutorials" },
+      { name: "API Reference", href: "/api-reference" },
+      { name: "Libraries", href: "/libraries" }
+    ]
+  },
+  {
+    title: "Company",
+    links: [
+      { name: "About", href: "/about" },
+      { name: "Careers", href: "/careers" },
+      { name: "Press", href: "/press" },
+      { name: "Partners", href: "/partners" }
+    ]
+  },
+  {
+    title: "Support",
+    links: [
+      { name: "Help Center", href: "/help-center" },
+      { name: "Status", href: "/status" },
+      { name: "Contact", href: "/contact" },
+      { name: "Community", href: "/community" }
+    ]
+  }
+];
+
+const fallbackSocial: SocialLinkType[] = [
+  { label: "GitHub", href: "https://github.com", icon: "github" },
+  { label: "Twitter", href: "https://twitter.com", icon: "twitter" },
+  { label: "LinkedIn", href: "https://linkedin.com", icon: "linkedin" },
+  { label: "YouTube", href: "https://youtube.com", icon: "youtube" },
+];
+
+const fallbackLegal = [
+  { name: "Privacy Policy", href: "/privacy-policy" },
+  { name: "Terms of Service", href: "/terms-of-service" },
+  { name: "Cookie Policy", href: "/cookie-policy" },
+];
 
 const Footer = () => {
-  const footerSections = [
-    {
-      title: "Products",
-      links: [
-        { name: "Channels", href: "/channels" },
-        { name: "Beams", href: "/beams" },
-        { name: "ChatKit", href: "/chatkit" },
-        { name: "Pusher Channels", href: "/channels" }
-      ]
-    },
-    {
-      title: "Developers",
-      links: [
-        { name: "Documentation", href: "/docs" },
-        { name: "Tutorials", href: "/tutorials" },
-        { name: "API Reference", href: "/api-reference" },
-        { name: "Libraries", href: "/libraries" }
-      ]
-    },
-    {
-      title: "Company",
-      links: [
-        { name: "About", href: "/about" },
-        { name: "Careers", href: "/careers" },
-        { name: "Press", href: "/press" },
-        { name: "Partners", href: "/partners" }
-      ]
-    },
-    {
-      title: "Support",
-      links: [
-        { name: "Help Center", href: "/help-center" },
-        { name: "Status", href: "/status" },
-        { name: "Contact", href: "/contact" },
-        { name: "Community", href: "/community" }
-      ]
-    }
-  ];
+  const { data } = useQuery({
+    queryKey: ["footer-content"],
+    queryFn: getFooterContent,
+    staleTime: 10 * 60 * 1000,
+  });
 
-  const socialLinks = [
-    { icon: Github, href: "#", label: "GitHub" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Youtube, href: "#", label: "YouTube" }
-  ];
+  const sections = data?.sections ?? fallbackSections;
+  const socialLinks = data?.social ?? fallbackSocial;
+  const legalLinks = data?.legal ?? fallbackLegal;
 
   return (
     <footer className="bg-gradient-subtle border-t border-border">
@@ -90,35 +116,49 @@ const Footer = () => {
                 The leading platform for building real-time applications that scale.
               </p>
               <div className="flex space-x-4">
-                {socialLinks.map((social, index) => (
-                  <Button
-                    key={index}
-                    variant="ghost"
-                    size="icon"
-                    className="hover:bg-secondary/50 hover:text-accent transition-colors"
-                    asChild
-                  >
-                    <a href={social.href} aria-label={social.label}>
-                      <social.icon className="h-5 w-5" />
-                    </a>
-                  </Button>
-                ))}
+                {socialLinks.map((social, index) => {
+                  const Icon = iconMap[social.icon] ?? Github;
+                  return (
+                    <Button
+                      key={index}
+                      variant="ghost"
+                      size="icon"
+                      className="hover:bg-secondary/50 hover:text-accent transition-colors"
+                      asChild
+                    >
+                      <a href={social.href} aria-label={social.label} target="_blank" rel="noopener noreferrer">
+                        <Icon className="h-5 w-5" />
+                      </a>
+                    </Button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Footer Links */}
-            {footerSections.map((section, sectionIndex) => (
+            {sections.map((section, sectionIndex) => (
               <div key={sectionIndex}>
                 <h4 className="font-semibold text-foreground mb-4">{section.title}</h4>
                 <ul className="space-y-3">
                   {section.links.map((link, linkIndex) => (
                     <li key={linkIndex}>
-                      <a
-                        href={link.href}
-                        className="text-muted-foreground hover:text-accent transition-colors"
-                      >
-                        {link.name}
-                      </a>
+                      {isExternalLink(link.href) ? (
+                        <a
+                          href={link.href}
+                          className="text-muted-foreground hover:text-accent transition-colors"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {link.name}
+                        </a>
+                      ) : (
+                        <Link
+                          to={link.href}
+                          className="text-muted-foreground hover:text-accent transition-colors"
+                        >
+                          {link.name}
+                        </Link>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -134,15 +174,27 @@ const Footer = () => {
               © 2024 Pusher Ltd. All rights reserved.
             </div>
             <div className="flex flex-wrap gap-6 text-sm">
-              <a href="/privacy-policy" className="text-muted-foreground hover:text-accent transition-colors">
-                Privacy Policy
-              </a>
-              <a href="/terms-of-service" className="text-muted-foreground hover:text-accent transition-colors">
-                Terms of Service
-              </a>
-              <a href="/cookie-policy" className="text-muted-foreground hover:text-accent transition-colors">
-                Cookie Policy
-              </a>
+              {legalLinks.map((link, i) => (
+                isExternalLink(link.href) ? (
+                  <a
+                    key={i}
+                    href={link.href}
+                    className="text-muted-foreground hover:text-accent transition-colors"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {link.name}
+                  </a>
+                ) : (
+                  <Link
+                    key={i}
+                    to={link.href}
+                    className="text-muted-foreground hover:text-accent transition-colors"
+                  >
+                    {link.name}
+                  </Link>
+                )
+              ))}
             </div>
           </div>
         </div>
