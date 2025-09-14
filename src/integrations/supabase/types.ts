@@ -14,7 +14,138 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      api_credentials: {
+        Row: {
+          app_id: string
+          cluster_name: string | null
+          created_at: string
+          id: string
+          key_value: string
+          secret_value: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          app_id: string
+          cluster_name?: string | null
+          created_at?: string
+          id?: string
+          key_value: string
+          secret_value: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          app_id?: string
+          cluster_name?: string | null
+          created_at?: string
+          id?: string
+          key_value?: string
+          secret_value?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      channels: {
+        Row: {
+          connections: number | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          messages: number | null
+          name: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          connections?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          messages?: number | null
+          name: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          connections?: number | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          messages?: number | null
+          name?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          plan: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          plan?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          plan?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_stats: {
+        Row: {
+          active_channels: number | null
+          id: string
+          messages_this_month: number | null
+          total_connections: number | null
+          updated_at: string
+          uptime: number | null
+          user_id: string
+        }
+        Insert: {
+          active_channels?: number | null
+          id?: string
+          messages_this_month?: number | null
+          total_connections?: number | null
+          updated_at?: string
+          uptime?: number | null
+          user_id: string
+        }
+        Update: {
+          active_channels?: number | null
+          id?: string
+          messages_this_month?: number | null
+          total_connections?: number | null
+          updated_at?: string
+          uptime?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
