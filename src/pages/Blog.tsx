@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar, Clock, ArrowRight, TrendingUp } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Blog = () => {
   const featuredPost = {
@@ -175,9 +176,11 @@ const Blog = () => {
                     {featuredPost.readTime}
                   </div>
                   
-                  <Button variant="hero" className="w-fit group">
-                    Read Article
-                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  <Button variant="hero" className="w-fit group" asChild>
+                    <Link to="/blog/building-real-time-collaborative-features">
+                      Read Article
+                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </Link>
                   </Button>
                 </CardContent>
               </div>
@@ -201,21 +204,22 @@ const Blog = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {recentPosts.map((post, index) => (
-              <Card key={index} className="bg-gradient-card border-border hover:shadow-card transition-all duration-300 group overflow-hidden">
-                <div className="relative">
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <Badge variant="secondary" className="absolute top-4 left-4">
-                    {post.category}
-                  </Badge>
-                </div>
-                <CardContent className="p-6">
-                  <CardTitle className="text-lg font-semibold mb-3 group-hover:text-accent transition-colors line-clamp-2">
-                    {post.title}
-                  </CardTitle>
+              <Link key={index} to={`/blog/post-${index + 1}`}>
+                <Card className="bg-gradient-card border-border hover:shadow-card transition-all duration-300 group overflow-hidden">
+                  <div className="relative">
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <Badge variant="secondary" className="absolute top-4 left-4">
+                      {post.category}
+                    </Badge>
+                  </div>
+                  <CardContent className="p-6">
+                    <CardTitle className="text-lg font-semibold mb-3 group-hover:text-accent transition-colors line-clamp-2">
+                      {post.title}
+                    </CardTitle>
                   <CardDescription className="text-muted-foreground mb-4 line-clamp-3">
                     {post.excerpt}
                   </CardDescription>
@@ -244,6 +248,7 @@ const Blog = () => {
                   </div>
                 </CardContent>
               </Card>
+              </Link>
             ))}
           </div>
           

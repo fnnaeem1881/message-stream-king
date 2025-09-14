@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Github, Chrome } from "lucide-react";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -71,8 +72,10 @@ const Login = () => {
                       Forgot password?
                     </a>
                   </div>
-                  <Button type="submit" variant="hero" className="w-full">
-                    Sign in
+                  <Button type="submit" variant="hero" className="w-full" asChild>
+                    <Link to="/dashboard">
+                      Sign in
+                    </Link>
                   </Button>
                 </form>
 
