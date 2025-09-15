@@ -208,10 +208,11 @@ const Dashboard = () => {
 
           {/* Main Content Tabs */}
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="credentials">API Keys</TabsTrigger>
+              <TabsTrigger value="credentials">App Keys</TabsTrigger>
               <TabsTrigger value="channels">Channels</TabsTrigger>
+              <TabsTrigger value="debug">Debug Console</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
 
@@ -231,13 +232,13 @@ const Dashboard = () => {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="bg-secondary/50 rounded-lg p-4">
-                      <h4 className="font-semibold mb-2">1. Install the library</h4>
+                      <h4 className="font-semibold mb-2">1. Install Pusher Channels</h4>
                       <code className="text-sm text-muted-foreground">npm install pusher-js</code>
                     </div>
                     <div className="bg-secondary/50 rounded-lg p-4">
                       <h4 className="font-semibold mb-2">2. Initialize Pusher</h4>
                       <code className="text-sm text-muted-foreground">
-                        const pusher = new Pusher('{credentials?.key_value || 'your-key'}')
+                        const pusher = new Pusher('{credentials?.key_value || 'your-key'}', {`{cluster: '${credentials?.cluster_name || 'us-east-1'}'}`})
                       </code>
                     </div>
                     <Button variant="hero" className="w-full">
@@ -278,16 +279,16 @@ const Dashboard = () => {
               </div>
             </TabsContent>
 
-            {/* API Keys Tab */}
+            {/* App Keys Tab */}
             <TabsContent value="credentials" className="space-y-6">
               <Card className="bg-gradient-card border-border">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Key className="h-5 w-5" />
-                    API Credentials
+                    App Keys
                   </CardTitle>
                   <CardDescription>
-                    Use these credentials to connect your application to Pusher
+                    Use these credentials to authenticate your application with Pusher Channels
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -503,6 +504,76 @@ channel.bind('my-event', (data) => {
                   ))
                 )}
               </div>
+            </TabsContent>
+
+            {/* Debug Console Tab */}
+            <TabsContent value="debug" className="space-y-6">
+              <Card className="bg-gradient-card border-border">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Activity className="h-5 w-5" />
+                    Debug Console
+                  </CardTitle>
+                  <CardDescription>
+                    Monitor real-time events and debug your application
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-sm font-medium">Live Event Stream</span>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      Clear Console
+                    </Button>
+                  </div>
+                  
+                  <div className="bg-secondary/30 rounded-lg p-4 h-64 overflow-y-auto font-mono text-sm">
+                    <div className="space-y-2 text-muted-foreground">
+                      <div className="flex items-center gap-2">
+                        <span className="text-green-500">[INFO]</span>
+                        <span className="text-xs">12:34:56</span>
+                        <span>Application started successfully</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-blue-500">[EVENT]</span>
+                        <span className="text-xs">12:34:57</span>
+                        <span>Channel 'test-channel' subscribed</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-yellow-500">[WARNING]</span>
+                        <span className="text-xs">12:35:02</span>
+                        <span>Rate limit warning: 80% of quota used</span>
+                      </div>
+                      <div className="text-xs text-muted-foreground/60 mt-4">
+                        Waiting for events...
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t pt-4">
+                    <h4 className="font-semibold mb-3">Event Creator</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label>Channel</Label>
+                        <Input placeholder="my-channel" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Event</Label>
+                        <Input placeholder="my-event" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Data (JSON)</Label>
+                        <Input placeholder='{"message": "Hello"}' />
+                      </div>
+                    </div>
+                    <Button variant="hero" className="mt-4">
+                      Trigger Event
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             {/* Analytics Tab */}
