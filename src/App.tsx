@@ -33,6 +33,7 @@ import NotFound from "./pages/NotFound";
 import BlogPost from "./pages/BlogPost";
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -50,13 +51,13 @@ const App = () => (
           <Route path="/docs" element={<Docs />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/support" element={<Support />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/auth" element={<Auth />} />
+           <Route path="/login" element={<Auth />} />
+           <Route path="/signup" element={<Auth />} />
+           <Route path="/auth" element={<Auth />} />
           <Route path="/channels" element={<Channels />} />
           <Route path="/beams" element={<Beams />} />
           <Route path="/chatkit" element={<ChatKit />} />
