@@ -1,14 +1,26 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { Github, Chrome } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Github, Chrome, Info } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("demo@pusher.com");
+  const [password, setPassword] = useState("demo123");
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Simple demo login - just navigate to dashboard
+    navigate('/dashboard');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -16,6 +28,16 @@ const Login = () => {
       <main className="pt-16">
         <div className="container mx-auto px-6 py-16">
           <div className="max-w-md mx-auto">
+            {/* Demo Credentials Alert */}
+            <Alert className="mb-6 border-blue-200 bg-blue-50 dark:bg-blue-950 dark:border-blue-800">
+              <Info className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
+                <strong>Demo Credentials:</strong><br />
+                Email: demo@pusher.com<br />
+                Password: demo123
+              </AlertDescription>
+            </Alert>
+
             <Card className="border-border bg-card/50 backdrop-blur-sm">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
@@ -44,12 +66,14 @@ const Login = () => {
                 </div>
 
                 {/* Email Login */}
-                <form className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email"
                       className="bg-background"
                     />
@@ -59,6 +83,8 @@ const Login = () => {
                     <Input
                       id="password"
                       type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
                       className="bg-background"
                     />
@@ -72,10 +98,8 @@ const Login = () => {
                       Forgot password?
                     </a>
                   </div>
-                  <Button type="submit" variant="hero" className="w-full" asChild>
-                    <Link to="/dashboard">
-                      Sign in
-                    </Link>
+                  <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700">
+                    Sign in
                   </Button>
                 </form>
 
