@@ -12,7 +12,6 @@ import Blog from "./pages/Blog";
 import Support from "./pages/Support";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
-import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Channels from "./pages/Channels";
 import Beams from "./pages/Beams";

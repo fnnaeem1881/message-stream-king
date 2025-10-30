@@ -84,6 +84,21 @@ const Auth = () => {
             <p className="text-muted-foreground">Access your real-time messaging dashboard</p>
           </div>
 
+          {/* Demo Credentials Info */}
+          <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+            <div className="flex items-start gap-2">
+              <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+              <div className="text-sm">
+                <p className="font-semibold text-blue-900 dark:text-blue-100 mb-1">Demo Credentials</p>
+                <p className="text-blue-800 dark:text-blue-200">
+                  Create an account or try with:<br />
+                  <span className="font-mono">demo@pusher.com</span><br />
+                  Password: <span className="font-mono">demo123456</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
           <Card className="bg-gradient-card border-border shadow-card">
             <CardHeader className="text-center">
               <CardTitle>Get Started</CardTitle>
