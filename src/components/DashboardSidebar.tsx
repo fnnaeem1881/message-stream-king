@@ -8,7 +8,8 @@ import {
   AlertCircle, 
   Webhook, 
   Users, 
-  Settings 
+  Settings,
+  UserCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,7 @@ interface DashboardSidebarProps {
 
 const menuItems = [
   { id: "overview", label: "Overview", icon: Home },
+  { id: "profile", label: "Profile", icon: UserCircle },
   { id: "getting-started", label: "Getting Started", icon: BookOpen },
   { id: "app-keys", label: "App Keys", icon: Key },
   { id: "functions", label: "Functions", icon: Zap },

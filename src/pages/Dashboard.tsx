@@ -30,9 +30,14 @@ import {
   Zap,
   BarChart3,
   Settings,
-  UserPlus
+  UserPlus,
+  UserCircle,
+  Save
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useDashboardData } from "@/hooks/useDashboardData";
+import { supabase } from "@/integrations/supabase/client";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 
 interface DebugEvent {
@@ -46,12 +51,19 @@ interface DebugEvent {
 
 const Dashboard = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { profile, refetch } = useDashboardData();
   const navigate = useNavigate();
   
   const [activeTab, setActiveTab] = useState("overview");
   const [showApiKey, setShowApiKey] = useState(false);
   const [showSecretKey, setShowSecretKey] = useState(false);
   const [isDebugRunning, setIsDebugRunning] = useState(true);
+  
+  // Profile update state
+  const [displayName, setDisplayName] = useState("");
+  const [profileEmail, setProfileEmail] = useState("");
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   
   // Mock data
   const credentials = {
@@ -89,6 +101,36 @@ const Dashboard = () => {
       title: "Copied!",
       description: `${label} copied to clipboard.`,
     });
+  };
+
+  const handleUpdateProfile = async () => {
+    if (!user) return;
+    
+    setIsUpdatingProfile(true);
+    
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        display_name: displayName,
+        email: profileEmail
+      })
+      .eq('user_id', user.id);
+    
+    if (error) {
+      toast({
+        title: "Error updating profile",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Profile updated!",
+        description: "Your profile information has been saved.",
+      });
+      refetch();
+    }
+    
+    setIsUpdatingProfile(false);
   };
 
   const handleSendDebugEvent = () => {
@@ -202,6 +244,92 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           </div>
+        );
+
+      case "profile":
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <UserCircle className="h-5 w-5 text-purple-600" />
+                Profile Settings
+              </CardTitle>
+              <CardDescription>Manage your personal information</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center gap-4 pb-6 border-b">
+                <Avatar className="h-20 w-20">
+                  <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-2xl">
+                    {(profile?.display_name || user?.email || 'U')[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-lg font-semibold">{profile?.display_name || 'User'}</h3>
+                  <p className="text-sm text-muted-foreground">{profile?.email || user?.email}</p>
+                  <Badge variant="secondary" className="mt-2">
+                    {profile?.plan || 'Free'} Plan
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="display-name">Display Name</Label>
+                  <Input
+                    id="display-name"
+                    value={displayName || profile?.display_name || ''}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Enter your name"
+                    className="mt-2"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="profile-email">Email</Label>
+                  <Input
+                    id="profile-email"
+                    type="email"
+                    value={profileEmail || profile?.email || ''}
+                    onChange={(e) => setProfileEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    This is the email associated with your account
+                  </p>
+                </div>
+
+                <div>
+                  <Label>User ID</Label>
+                  <Input
+                    value={user?.id || 'N/A'}
+                    readOnly
+                    className="mt-2 font-mono text-sm bg-muted"
+                  />
+                </div>
+
+                <div className="pt-4">
+                  <Button 
+                    onClick={handleUpdateProfile}
+                    disabled={isUpdatingProfile}
+                    className="w-full bg-purple-600 hover:bg-purple-700"
+                  >
+                    {isUpdatingProfile ? (
+                      <>
+                        <Activity className="h-4 w-4 mr-2 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Changes
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         );
 
       case "getting-started":
