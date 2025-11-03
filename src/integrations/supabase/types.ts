@@ -47,6 +47,36 @@ export type Database = {
         }
         Relationships: []
       }
+      app_settings: {
+        Row: {
+          app_name: string | null
+          created_at: string
+          id: string
+          ssl_enabled: boolean | null
+          updated_at: string
+          user_id: string
+          webhooks_enabled: boolean | null
+        }
+        Insert: {
+          app_name?: string | null
+          created_at?: string
+          id?: string
+          ssl_enabled?: boolean | null
+          updated_at?: string
+          user_id: string
+          webhooks_enabled?: boolean | null
+        }
+        Update: {
+          app_name?: string | null
+          created_at?: string
+          id?: string
+          ssl_enabled?: boolean | null
+          updated_at?: string
+          user_id?: string
+          webhooks_enabled?: boolean | null
+        }
+        Relationships: []
+      }
       channels: {
         Row: {
           connections: number | null
@@ -78,6 +108,66 @@ export type Database = {
           messages?: number | null
           name?: string
           type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      collaborators: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          role: string
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          role: string
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          role?: string
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      functions: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          runtime: string
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          runtime: string
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          runtime?: string
+          status?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -142,6 +232,36 @@ export type Database = {
           total_connections?: number | null
           updated_at?: string
           uptime?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      webhooks: {
+        Row: {
+          created_at: string
+          events: string[] | null
+          id: string
+          status: string | null
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          events?: string[] | null
+          id?: string
+          status?: string | null
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          events?: string[] | null
+          id?: string
+          status?: string | null
+          updated_at?: string
+          url?: string
           user_id?: string
         }
         Relationships: []

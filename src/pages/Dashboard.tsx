@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -91,6 +91,10 @@ const Dashboard = () => {
   const [webhooks, setWebhooks] = useState<any[]>([]);
   const [collaborators, setCollaborators] = useState<any[]>([]);
   
+  // Database data state
+  const [appSettings, setAppSettings] = useState<any>(null);
+  const [loadingData, setLoadingData] = useState(true);
+  
   // Mock data
   const credentials = {
     app_id: '1234567',
@@ -120,6 +124,67 @@ const Dashboard = () => {
   const [debugChannel, setDebugChannel] = useState("");
   const [debugEventName, setDebugEventName] = useState("");
   const [debugEventData, setDebugEventData] = useState("");
+
+  // Fetch all data on mount
+  useEffect(() => {
+    if (user) {
+      fetchAllData();
+    }
+  }, [user]);
+
+  const fetchAllData = async () => {
+    if (!user) return;
+
+    setLoadingData(true);
+    try {
+      // Fetch functions
+      const { data: functionsData } = await supabase
+        .from('functions')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      // Fetch webhooks
+      const { data: webhooksData } = await supabase
+        .from('webhooks')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      // Fetch collaborators
+      const { data: collaboratorsData } = await supabase
+        .from('collaborators')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      // Fetch app settings
+      const { data: settingsData } = await supabase
+        .from('app_settings')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      setFunctions(functionsData || []);
+      setWebhooks(webhooksData || []);
+      setCollaborators(collaboratorsData || []);
+      setAppSettings(settingsData);
+      
+      // Initialize settings if not exist
+      if (!settingsData) {
+        const { data: newSettings } = await supabase
+          .from('app_settings')
+          .insert({ user_id: user.id })
+          .select()
+          .single();
+        setAppSettings(newSettings);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoadingData(false);
+    }
+  };
 
   const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
@@ -194,8 +259,8 @@ const Dashboard = () => {
     navigate('/auth');
   };
 
-  const handleCreateFunction = () => {
-    if (!functionName) {
+  const handleCreateFunction = async () => {
+    if (!functionName || !user) {
       toast({
         title: "Missing field",
         description: "Please enter a function name",
@@ -204,15 +269,27 @@ const Dashboard = () => {
       return;
     }
 
-    const newFunction = {
-      id: Date.now().toString(),
-      name: functionName,
-      runtime: functionRuntime,
-      status: 'active',
-      created_at: new Date().toISOString()
-    };
+    const { data, error } = await supabase
+      .from('functions')
+      .insert({
+        user_id: user.id,
+        name: functionName,
+        runtime: functionRuntime,
+        status: 'active'
+      })
+      .select()
+      .single();
 
-    setFunctions(prev => [...prev, newFunction]);
+    if (error) {
+      toast({
+        title: "Error creating function",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setFunctions(prev => [data, ...prev]);
     setFunctionName("");
     setShowFunctionDialog(false);
     
@@ -222,8 +299,8 @@ const Dashboard = () => {
     });
   };
 
-  const handleCreateWebhook = () => {
-    if (!webhookUrl) {
+  const handleCreateWebhook = async () => {
+    if (!webhookUrl || !user) {
       toast({
         title: "Missing field",
         description: "Please enter a webhook URL",
@@ -232,15 +309,27 @@ const Dashboard = () => {
       return;
     }
 
-    const newWebhook = {
-      id: Date.now().toString(),
-      url: webhookUrl,
-      events: webhookEvents,
-      status: 'active',
-      created_at: new Date().toISOString()
-    };
+    const { data, error } = await supabase
+      .from('webhooks')
+      .insert({
+        user_id: user.id,
+        url: webhookUrl,
+        events: webhookEvents,
+        status: 'active'
+      })
+      .select()
+      .single();
 
-    setWebhooks(prev => [...prev, newWebhook]);
+    if (error) {
+      toast({
+        title: "Error creating webhook",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setWebhooks(prev => [data, ...prev]);
     setWebhookUrl("");
     setWebhookEvents([]);
     setShowWebhookDialog(false);
@@ -251,8 +340,8 @@ const Dashboard = () => {
     });
   };
 
-  const handleInviteCollaborator = () => {
-    if (!collaboratorEmail) {
+  const handleInviteCollaborator = async () => {
+    if (!collaboratorEmail || !user) {
       toast({
         title: "Missing field",
         description: "Please enter an email address",
@@ -261,15 +350,27 @@ const Dashboard = () => {
       return;
     }
 
-    const newCollaborator = {
-      id: Date.now().toString(),
-      email: collaboratorEmail,
-      role: collaboratorRole,
-      status: 'invited',
-      created_at: new Date().toISOString()
-    };
+    const { data, error } = await supabase
+      .from('collaborators')
+      .insert({
+        user_id: user.id,
+        email: collaboratorEmail,
+        role: collaboratorRole,
+        status: 'invited'
+      })
+      .select()
+      .single();
 
-    setCollaborators(prev => [...prev, newCollaborator]);
+    if (error) {
+      toast({
+        title: "Error inviting collaborator",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setCollaborators(prev => [data, ...prev]);
     setCollaboratorEmail("");
     setShowCollaboratorDialog(false);
     
@@ -289,19 +390,86 @@ const Dashboard = () => {
     // In a real app, this would delete the app and redirect
   };
 
-  const handleDeleteFunction = (id: string) => {
+  const handleDeleteFunction = async (id: string) => {
+    const { error } = await supabase
+      .from('functions')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast({
+        title: "Error deleting function",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setFunctions(prev => prev.filter(f => f.id !== id));
     toast({ title: "Function deleted" });
   };
 
-  const handleDeleteWebhook = (id: string) => {
+  const handleDeleteWebhook = async (id: string) => {
+    const { error } = await supabase
+      .from('webhooks')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast({
+        title: "Error deleting webhook",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setWebhooks(prev => prev.filter(w => w.id !== id));
     toast({ title: "Webhook deleted" });
   };
 
-  const handleRemoveCollaborator = (id: string) => {
+  const handleRemoveCollaborator = async (id: string) => {
+    const { error } = await supabase
+      .from('collaborators')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast({
+        title: "Error removing collaborator",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
     setCollaborators(prev => prev.filter(c => c.id !== id));
     toast({ title: "Collaborator removed" });
+  };
+
+  const handleSaveSettings = async () => {
+    if (!user || !appSettings) return;
+
+    const { error } = await supabase
+      .from('app_settings')
+      .update({
+        app_name: appName,
+      })
+      .eq('user_id', user.id);
+
+    if (error) {
+      toast({
+        title: "Error saving settings",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Settings saved",
+      description: "Your app settings have been updated",
+    });
   };
 
   const renderContent = () => {
@@ -1076,7 +1244,7 @@ channel.bind('my-event', function(data) {
                   <span className="text-sm text-muted-foreground">Webhook events enabled</span>
                 </div>
               </div>
-              <Button className="w-full">
+              <Button className="w-full" onClick={handleSaveSettings}>
                 <Save className="h-4 w-4 mr-2" />
                 Save Settings
               </Button>
@@ -1203,7 +1371,13 @@ channel.bind('my-event', function(data) {
         
         <main className="flex-1 p-6">
           <div className="max-w-6xl mx-auto">
-            {renderContent()}
+            {loadingData ? (
+              <div className="flex items-center justify-center py-12">
+                <Activity className="h-8 w-8 animate-spin text-purple-600" />
+              </div>
+            ) : (
+              renderContent()
+            )}
           </div>
         </main>
       </div>
