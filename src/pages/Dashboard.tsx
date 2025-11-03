@@ -7,6 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Key, 
   Activity, 
@@ -51,7 +55,7 @@ interface DebugEvent {
 
 const Dashboard = () => {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { profile, refetch } = useDashboardData();
   const navigate = useNavigate();
   
@@ -64,6 +68,28 @@ const Dashboard = () => {
   const [displayName, setDisplayName] = useState("");
   const [profileEmail, setProfileEmail] = useState("");
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+  
+  // Dialog states
+  const [showFunctionDialog, setShowFunctionDialog] = useState(false);
+  const [showWebhookDialog, setShowWebhookDialog] = useState(false);
+  const [showCollaboratorDialog, setShowCollaboratorDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  
+  // Form states
+  const [functionName, setFunctionName] = useState("");
+  const [functionRuntime, setFunctionRuntime] = useState("nodejs18");
+  const [webhookUrl, setWebhookUrl] = useState("");
+  const [webhookEvents, setWebhookEvents] = useState<string[]>([]);
+  const [collaboratorEmail, setCollaboratorEmail] = useState("");
+  const [collaboratorRole, setCollaboratorRole] = useState("viewer");
+  const [appName, setAppName] = useState("My Pusher App");
+  
+  // Mock data for functions, webhooks, collaborators
+  const [functions, setFunctions] = useState<any[]>([]);
+  const [webhooks, setWebhooks] = useState<any[]>([]);
+  const [collaborators, setCollaborators] = useState<any[]>([]);
   
   // Mock data
   const credentials = {
@@ -161,6 +187,121 @@ const Dashboard = () => {
       title: "Event sent",
       description: `Event "${debugEventName}" sent to channel "${debugChannel}"`,
     });
+  };
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/auth');
+  };
+
+  const handleCreateFunction = () => {
+    if (!functionName) {
+      toast({
+        title: "Missing field",
+        description: "Please enter a function name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newFunction = {
+      id: Date.now().toString(),
+      name: functionName,
+      runtime: functionRuntime,
+      status: 'active',
+      created_at: new Date().toISOString()
+    };
+
+    setFunctions(prev => [...prev, newFunction]);
+    setFunctionName("");
+    setShowFunctionDialog(false);
+    
+    toast({
+      title: "Function created",
+      description: `Function "${functionName}" has been created successfully`,
+    });
+  };
+
+  const handleCreateWebhook = () => {
+    if (!webhookUrl) {
+      toast({
+        title: "Missing field",
+        description: "Please enter a webhook URL",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newWebhook = {
+      id: Date.now().toString(),
+      url: webhookUrl,
+      events: webhookEvents,
+      status: 'active',
+      created_at: new Date().toISOString()
+    };
+
+    setWebhooks(prev => [...prev, newWebhook]);
+    setWebhookUrl("");
+    setWebhookEvents([]);
+    setShowWebhookDialog(false);
+    
+    toast({
+      title: "Webhook created",
+      description: "Webhook has been configured successfully",
+    });
+  };
+
+  const handleInviteCollaborator = () => {
+    if (!collaboratorEmail) {
+      toast({
+        title: "Missing field",
+        description: "Please enter an email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newCollaborator = {
+      id: Date.now().toString(),
+      email: collaboratorEmail,
+      role: collaboratorRole,
+      status: 'invited',
+      created_at: new Date().toISOString()
+    };
+
+    setCollaborators(prev => [...prev, newCollaborator]);
+    setCollaboratorEmail("");
+    setShowCollaboratorDialog(false);
+    
+    toast({
+      title: "Invitation sent",
+      description: `Invitation sent to ${collaboratorEmail}`,
+    });
+  };
+
+  const handleDeleteApp = () => {
+    toast({
+      title: "App deleted",
+      description: "Your application has been deleted",
+      variant: "destructive",
+    });
+    setShowDeleteDialog(false);
+    // In a real app, this would delete the app and redirect
+  };
+
+  const handleDeleteFunction = (id: string) => {
+    setFunctions(prev => prev.filter(f => f.id !== id));
+    toast({ title: "Function deleted" });
+  };
+
+  const handleDeleteWebhook = (id: string) => {
+    setWebhooks(prev => prev.filter(w => w.id !== id));
+    toast({ title: "Webhook deleted" });
+  };
+
+  const handleRemoveCollaborator = (id: string) => {
+    setCollaborators(prev => prev.filter(c => c.id !== id));
+    toast({ title: "Collaborator removed" });
   };
 
   const renderContent = () => {
@@ -366,7 +507,11 @@ channel.bind('my-event', function(data) {
 });`}
                 </pre>
               </div>
-              <Button className="w-full" variant="outline">
+              <Button 
+                className="w-full" 
+                variant="outline"
+                onClick={() => window.open('https://pusher.com/docs', '_blank')}
+              >
                 <ExternalLink className="h-4 w-4 mr-2" />
                 View Full Documentation
               </Button>
@@ -485,18 +630,82 @@ channel.bind('my-event', function(data) {
         return (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5" />
-                Functions
-              </CardTitle>
-              <CardDescription>Serverless functions for your Pusher app</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5" />
+                    Functions
+                  </CardTitle>
+                  <CardDescription>Serverless functions for your Pusher app</CardDescription>
+                </div>
+                <Dialog open={showFunctionDialog} onOpenChange={setShowFunctionDialog}>
+                  <DialogTrigger asChild>
+                    <Button>Create Function</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create New Function</DialogTitle>
+                      <DialogDescription>Add a serverless function to your app</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <Label>Function Name</Label>
+                        <Input
+                          value={functionName}
+                          onChange={(e) => setFunctionName(e.target.value)}
+                          placeholder="my-function"
+                          className="mt-2"
+                        />
+                      </div>
+                      <div>
+                        <Label>Runtime</Label>
+                        <Select value={functionRuntime} onValueChange={setFunctionRuntime}>
+                          <SelectTrigger className="mt-2">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="nodejs18">Node.js 18</SelectItem>
+                            <SelectItem value="nodejs20">Node.js 20</SelectItem>
+                            <SelectItem value="python39">Python 3.9</SelectItem>
+                            <SelectItem value="python311">Python 3.11</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowFunctionDialog(false)}>Cancel</Button>
+                      <Button onClick={handleCreateFunction}>Create</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12">
-                <Zap className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-4">No functions configured yet</p>
-                <Button>Create Function</Button>
-              </div>
+              {functions.length === 0 ? (
+                <div className="text-center py-12">
+                  <Zap className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">No functions configured yet</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {functions.map((func) => (
+                    <div key={func.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                      <div>
+                        <h4 className="font-semibold">{func.name}</h4>
+                        <p className="text-sm text-muted-foreground">{func.runtime}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={func.status === 'active' ? 'default' : 'secondary'}>
+                          {func.status}
+                        </Badge>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteFunction(func.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         );
@@ -657,18 +866,90 @@ channel.bind('my-event', function(data) {
         return (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Webhook className="h-5 w-5" />
-                Webhooks
-              </CardTitle>
-              <CardDescription>Configure webhooks for channel events</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Webhook className="h-5 w-5" />
+                    Webhooks
+                  </CardTitle>
+                  <CardDescription>Configure webhooks for channel events</CardDescription>
+                </div>
+                <Dialog open={showWebhookDialog} onOpenChange={setShowWebhookDialog}>
+                  <DialogTrigger asChild>
+                    <Button>Add Webhook</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Webhook</DialogTitle>
+                      <DialogDescription>Configure a webhook endpoint for events</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <Label>Webhook URL</Label>
+                        <Input
+                          value={webhookUrl}
+                          onChange={(e) => setWebhookUrl(e.target.value)}
+                          placeholder="https://example.com/webhook"
+                          className="mt-2"
+                        />
+                      </div>
+                      <div>
+                        <Label>Events to subscribe</Label>
+                        <div className="mt-2 space-y-2">
+                          {['channel_occupied', 'channel_vacated', 'member_added', 'member_removed'].map((event) => (
+                            <div key={event} className="flex items-center gap-2">
+                              <Switch
+                                checked={webhookEvents.includes(event)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setWebhookEvents(prev => [...prev, event]);
+                                  } else {
+                                    setWebhookEvents(prev => prev.filter(e => e !== event));
+                                  }
+                                }}
+                              />
+                              <Label className="font-normal">{event}</Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowWebhookDialog(false)}>Cancel</Button>
+                      <Button onClick={handleCreateWebhook}>Create</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12">
-                <Webhook className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-4">No webhooks configured</p>
-                <Button>Add Webhook</Button>
-              </div>
+              {webhooks.length === 0 ? (
+                <div className="text-center py-12">
+                  <Webhook className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">No webhooks configured</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {webhooks.map((webhook) => (
+                    <div key={webhook.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                      <div className="flex-1">
+                        <h4 className="font-semibold font-mono text-sm">{webhook.url}</h4>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Events: {webhook.events.length > 0 ? webhook.events.join(', ') : 'All events'}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={webhook.status === 'active' ? 'default' : 'secondary'}>
+                          {webhook.status}
+                        </Badge>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteWebhook(webhook.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         );
@@ -677,18 +958,83 @@ channel.bind('my-event', function(data) {
         return (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Collaborators
-              </CardTitle>
-              <CardDescription>Manage team access to this app</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Collaborators
+                  </CardTitle>
+                  <CardDescription>Manage team access to this app</CardDescription>
+                </div>
+                <Dialog open={showCollaboratorDialog} onOpenChange={setShowCollaboratorDialog}>
+                  <DialogTrigger asChild>
+                    <Button>Invite Collaborator</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Invite Collaborator</DialogTitle>
+                      <DialogDescription>Add a team member to your app</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <Label>Email Address</Label>
+                        <Input
+                          type="email"
+                          value={collaboratorEmail}
+                          onChange={(e) => setCollaboratorEmail(e.target.value)}
+                          placeholder="colleague@example.com"
+                          className="mt-2"
+                        />
+                      </div>
+                      <div>
+                        <Label>Role</Label>
+                        <Select value={collaboratorRole} onValueChange={setCollaboratorRole}>
+                          <SelectTrigger className="mt-2">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="owner">Owner</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="developer">Developer</SelectItem>
+                            <SelectItem value="viewer">Viewer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowCollaboratorDialog(false)}>Cancel</Button>
+                      <Button onClick={handleInviteCollaborator}>Send Invitation</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12">
-                <UserPlus className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground mb-4">No collaborators added yet</p>
-                <Button>Invite Collaborator</Button>
-              </div>
+              {collaborators.length === 0 ? (
+                <div className="text-center py-12">
+                  <UserPlus className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">No collaborators added yet</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {collaborators.map((collaborator) => (
+                    <div key={collaborator.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                      <div>
+                        <h4 className="font-semibold">{collaborator.email}</h4>
+                        <p className="text-sm text-muted-foreground capitalize">{collaborator.role}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={collaborator.status === 'active' ? 'default' : 'secondary'}>
+                          {collaborator.status}
+                        </Badge>
+                        <Button variant="ghost" size="sm" onClick={() => handleRemoveCollaborator(collaborator.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         );
@@ -706,15 +1052,62 @@ channel.bind('my-event', function(data) {
             <CardContent className="space-y-6">
               <div>
                 <Label>App Name</Label>
-                <Input value="My Pusher App" className="mt-2" />
+                <Input 
+                  value={appName} 
+                  onChange={(e) => setAppName(e.target.value)}
+                  className="mt-2" 
+                />
               </div>
               <div>
                 <Label>Cluster</Label>
-                <Input value={credentials.cluster_name} readOnly className="mt-2" />
+                <Input value={credentials.cluster_name} readOnly className="mt-2 bg-muted" />
               </div>
+              <div>
+                <Label>Enable SSL</Label>
+                <div className="flex items-center gap-2 mt-2">
+                  <Switch defaultChecked />
+                  <span className="text-sm text-muted-foreground">SSL/TLS encryption enabled</span>
+                </div>
+              </div>
+              <div>
+                <Label>Enable Webhooks</Label>
+                <div className="flex items-center gap-2 mt-2">
+                  <Switch defaultChecked />
+                  <span className="text-sm text-muted-foreground">Webhook events enabled</span>
+                </div>
+              </div>
+              <Button className="w-full">
+                <Save className="h-4 w-4 mr-2" />
+                Save Settings
+              </Button>
               <div className="pt-4 border-t">
-                <h3 className="text-sm font-semibold text-red-600 mb-2">Danger Zone</h3>
-                <Button variant="destructive" size="sm">Delete App</Button>
+                <h3 className="text-sm font-semibold text-red-600 mb-3">Danger Zone</h3>
+                <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+                  <DialogTrigger asChild>
+                    <Button variant="destructive" size="sm">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete App
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Delete Application</DialogTitle>
+                      <DialogDescription className="text-red-600">
+                        This action cannot be undone. This will permanently delete your application and all associated data.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                      <p className="text-sm text-muted-foreground">
+                        Type <span className="font-semibold">DELETE</span> to confirm:
+                      </p>
+                      <Input placeholder="DELETE" className="mt-2" />
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
+                      <Button variant="destructive" onClick={handleDeleteApp}>Delete Forever</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardContent>
           </Card>
@@ -744,19 +1137,58 @@ channel.bind('my-event', function(data) {
               <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                 App ID: {credentials.app_id}
               </Badge>
-              <Button variant="ghost" size="sm">
-                <Bell className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm">
-                <HelpCircle className="h-4 w-4" />
-              </Button>
+              
+              <Dialog open={showNotifications} onOpenChange={setShowNotifications}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <Bell className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Notifications</DialogTitle>
+                  </DialogHeader>
+                  <div className="py-4">
+                    <p className="text-sm text-muted-foreground text-center py-8">No new notifications</p>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={showHelp} onOpenChange={setShowHelp}>
+                <DialogTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    <HelpCircle className="h-4 w-4" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Help & Support</DialogTitle>
+                    <DialogDescription>Get help with your Pusher app</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <Button variant="outline" className="w-full justify-start" onClick={() => window.open('https://pusher.com/docs', '_blank')}>
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Documentation
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start" onClick={() => window.open('https://support.pusher.com', '_blank')}>
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Support Center
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start" onClick={() => window.open('https://pusher.com/tutorials', '_blank')}>
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Tutorials
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
                   <AvatarFallback className="bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs">
-                    DU
+                    {(profile?.display_name || user?.email || 'U')[0].toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <Button variant="ghost" size="sm" onClick={() => navigate('/login')}>
+                <Button variant="ghost" size="sm" onClick={handleLogout}>
                   <LogOut className="h-4 w-4" />
                 </Button>
               </div>
